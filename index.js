@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const app = express();
-const server = app.listen(process.env.PORT || 80);  // export PORT=8080
+const server = app.listen(process.env.PORT || 8080);  // export PORT=8080
 
 const fs = require('fs');
 console.log("ramzi needs a noise ring")
