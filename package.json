@@ -1,0 +1,25 @@
+{
+  "name": "spotless_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PatrickShaw/spotless_api.git"
+  },
+  "author": "Potatoes and Salmon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PatrickShaw/spotless_api/issues"
+  },
+  "homepage": "https://github.com/PatrickShaw/spotless_api#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "nodemailer": "^2.6.4",
+    "socket.io": "^1.6.0",
+    "sqlite3": "^3.1.8"
+  }
+}
