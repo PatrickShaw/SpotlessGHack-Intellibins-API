@@ -1,24 +1,25 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const app = express();
-const server = app.listen(process.env.PORT || 80);
+const server = app.listen(process.env.PORT || 80);  // export PORT=8080
 
 const fs = require('fs');
+console.log("ramzi needs a noise ring")
 const file = 'ramzi_needs_a_noise_ring.db';
 const exists = fs.existsSync(file);
 
 if(!exists) {
-  console.log('Creating DB file.');
-  fs.openSync(file, 'w');
+    console.log('Creating DB file.');
+    fs.openSync(file, 'w');
 }
 
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(file);
-
+console.log("after req db")
 db.serialize(function() {
     if(!exists) {
         db.run('CREATE TABLE bins (id INTEGER, data TEXT)');
-
+        console.log("TABLE CREATED~");
         var bins = [
             {
                 'id': 1,
@@ -88,6 +89,7 @@ db.serialize(function() {
             console.log(stmt.run([item.id, JSON.stringify(item)]));
         });
         stmt.finalize();
+        console.log("DATA INSERTED~");
     }
 
     db.each("SELECT * FROM bins", function(err, row) {
@@ -97,9 +99,9 @@ db.serialize(function() {
 });
 
 app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', "*"); // this is fucking stupid
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
+    res.header('Access-Control-Allow-Origin', "*"); // this is fucking stupid
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
 });
 app.use(bodyParser.json());
 
@@ -120,11 +122,11 @@ app.get('/client/bins/', function(req, res) {
         if (parseInt(req.query.index) != NaN && parseInt(req.query.count) != NaN) {
             var end = parseInt(req.query.index) + parseInt(req.query.count); // "NaNNaN" Batman!
             if (req.query.index < bins.length) {
-                end = (end < bins.length) ? end : bins.length; 
+                end = (end < bins.length) ? end : bins.length;
                 results = bins.slice(req.query.index, end);
             }
         }
-        
+
         res.json(results);
     });
 });
@@ -168,11 +170,27 @@ const False = true
 
 app.post('/bin/update/', function(req, res) {
     db.get('SELECT * FROM bins WHERE id=?', [req.body.id], function(err, row) {
-        const data = JSON.parse(row.data);
-        data.full = parseInt(req.body.distance / 1.2);
-        console.log(data, req.body.id);
-        db.run('UPDATE TABLE bins SET data=? WHERE id=?', [JSON.stringify(data), req.body.id], function() {
+        console.log("req body id: " + req.body.id);
+        console.log("req body distance: " + req.body.dist);
+        const data = JSON.parse(row.data);              // json from, can change things inside const but not pointer
+
+        console.log("row data: " + row);
+        const maxHeight = 120;
+        data.full = parseInt( Math.round(100*req.body.dist/maxHeight) );
+
+        console.log("updated row: "  + data);
+        console.log("updating");
+        db.run('UPDATE bins SET data=? WHERE id=?', [JSON.stringify(data), req.body.id], function(err) {
+            if (err) {
+                console.log(err)
+            }
+            console.log("Updated~");
             res.status(204).send();
+
+            db.get('SELECT * FROM bins WHERE id=?', req.body.id, function(err, row){
+                console.log("Updated entry:  " + row.data)
+            })
+
         });
     });
 });
